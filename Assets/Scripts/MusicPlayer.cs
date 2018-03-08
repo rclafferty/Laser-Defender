@@ -17,6 +17,5 @@ public class MusicPlayer : MonoBehaviour {
             // Do not destroy between scenes
 			DontDestroyOnLoad(gameObject);
 		}
-		
 	}
 }

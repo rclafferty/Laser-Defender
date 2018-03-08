@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour {
     
@@ -32,8 +33,16 @@ public class PlayerController : MonoBehaviour {
             thisPlayer = this;
             // Declares not to destroy this object between scenes
             DontDestroyOnLoad(this);
-            // Hides from camera and disables input
-            SetActive(false);
+            if (SceneManager.GetActiveScene().name == "Game")
+            {
+                // Resets at bottom of play space
+                SetActive(true);
+            }
+            else
+            {
+                // Hides from camera and disables input
+                SetActive(false);
+            }
         }
         else
         {
