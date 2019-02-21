@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
     
@@ -29,6 +30,7 @@ public class PlayerController : MonoBehaviour {
     private bool isActive;
 
     int numberOfEnemies;
+    int score;
 
     private const int HEALTH_MAX = 10;
     private int health;
@@ -95,6 +97,10 @@ public class PlayerController : MonoBehaviour {
         numberOfEnemies = 0;
 
         health = HEALTH_MAX;
+        GameObject.Find("HealthText").GetComponent<Text>().text = "Health:  " + health;
+
+        score = 0;
+        GameObject.Find("ScoreText").GetComponent<Text>().text = "Score:  " + score;
     }
 	
 	// Update is called once per frame
@@ -165,12 +171,15 @@ public class PlayerController : MonoBehaviour {
 
     public void KilledEnemy()
     {
+        score += 100;
+        GameObject.Find("ScoreText").GetComponent<Text>().text = "Score:  " + score;
         UpdateNumberOfEnemies(GameObject.Find("EnemyFormation").GetComponent<EnemySpawner>().NumberOfCurrentEnemies);
     }
 
     public void Hit()
     {
         health--;
+        GameObject.Find("HealthText").GetComponent<Text>().text = "Health:  " + health;
 
         if (health == 0)
         {

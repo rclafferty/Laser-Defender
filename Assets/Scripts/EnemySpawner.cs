@@ -334,6 +334,7 @@ public class EnemySpawner : MonoBehaviour {
     public void EnemyDied()
     {
         numberOfCurrentEnemies--;
+        GameObject.Find("Player").GetComponent<PlayerController>().KilledEnemy();
 
         if (numberOfCurrentEnemies == 0)
         {
