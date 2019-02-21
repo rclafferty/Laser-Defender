@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class CharacterSelect : MonoBehaviour {
 
@@ -10,30 +11,69 @@ public class CharacterSelect : MonoBehaviour {
     // Sprites loaded from the Resources folder
     Sprite[] characterSprites;
 
+    const int CENTER_INDEX = 1;
+
+    const float BLOCK_TIMER_MAX = 0.2f;
+    float blockTimer;
+
 	// Use this for initialization
 	void Start () {
         // Set the character objects by finding them in the scene
-        characters = new GameObject[5];
-        characters[0] = GameObject.Find("Left 2");
-        characters[1] = GameObject.Find("Left 1");
-        characters[2] = GameObject.Find("Selected Ship");
-        characters[3] = GameObject.Find("Right 1");
-        characters[4] = GameObject.Find("Right 2");
+        characters = new GameObject[3];
+        characters[0] = GameObject.Find("Left 1");
+        characters[1] = GameObject.Find("Selected Ship");
+        characters[2] = GameObject.Find("Right 1");
 
         // Load the sprites from the Resouces folder
         characterSprites = Resources.LoadAll<Sprite>("ShipSprites/Player");
         Debug.Log("# of sprites: " + characterSprites.Length);
 
         // Set the indeces of the sprites to be initially shown
-        characterIndexes = new int[5];
-        characterIndexes[0] = characterSprites.Length - 2;
-        characterIndexes[1] = characterSprites.Length - 1;
-        characterIndexes[2] = 0;
-        characterIndexes[3] = 1;
-        characterIndexes[4] = 2;
+        characterIndexes = new int[3];
+        characterIndexes[0] = characterSprites.Length - 1;
+        characterIndexes[1] = 0;
+        characterIndexes[2] = 1;
 
         // Set the appropriate sprites to the game objects in the scene
         SetCharacterSprites();
+    }
+
+    private static bool isAxisInUse = false;
+
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            // Continue
+        }
+        else if (Input.GetButtonDown("Fire"))
+        {
+            SelectSpaceship();
+        }
+
+        if (!isAxisInUse)
+        {
+            isAxisInUse = true;
+            blockTimer = BLOCK_TIMER_MAX;
+
+            if (Input.GetAxisRaw("Horizontal") > 0)
+            {
+                ChooseRight();
+            }
+            else if (Input.GetAxis("Horizontal") < 0)
+            {
+                ChooseLeft();
+            }
+        }
+        else
+        {
+            blockTimer -= Time.deltaTime;
+
+            if (blockTimer <= 0.0f)
+            {
+                isAxisInUse = false;
+            }
+        }
     }
 
     /// <summary>
@@ -43,7 +83,8 @@ public class CharacterSelect : MonoBehaviour {
     {
         for (int i = 0; i < characterIndexes.Length; i++)
         {
-            characters[i].GetComponent<SpriteRenderer>().sprite = characterSprites[characterIndexes[i]];
+            //characters[i].GetComponent<SpriteRenderer>().sprite = characterSprites[characterIndexes[i]];
+            characters[i].GetComponent<Image>().sprite = characterSprites[characterIndexes[i]];
         }
     }
 
@@ -92,7 +133,7 @@ public class CharacterSelect : MonoBehaviour {
     {
         GameObject player = GameObject.Find("Player");
         // Set the player's sprite to use in the game
-        player.GetComponent<SpriteRenderer>().sprite = characterSprites[characterIndexes[2]];
+        player.GetComponent<SpriteRenderer>().sprite = characterSprites[characterIndexes[CENTER_INDEX]];
         player.GetComponent<PlayerController>().SetActive(true);
         SceneManager.LoadScene("Game");
     }

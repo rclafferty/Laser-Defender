@@ -16,6 +16,7 @@ public class MusicPlayer : MonoBehaviour {
 			instance = this;
             // Do not destroy between scenes
 			DontDestroyOnLoad(gameObject);
+            this.GetComponent<AudioSource>().Play();
 		}
 	}
 }

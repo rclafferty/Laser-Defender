@@ -9,17 +9,27 @@ public class EnemySpawner : MonoBehaviour {
     // Stores all the spawn points for the enemies
     GameObject[] enemySpawnPoints;
 
+    GameObject[] currentEnemies;
+
+    [SerializeField]
+    int numberOfCurrentEnemies;
+
     // Speed of the enemy formation
     const float SPEED = 2.0f;
 
     // Flag to show if the formation is moving left
+    [SerializeField]
     bool isMovingLeft;
+    [SerializeField]
     bool isMovingLeftWaiting;
     // Flag to show if the formation is moving right
+    [SerializeField]
     bool isMovingRight;
+    [SerializeField]
     bool isMovingRightWaiting;
 
     // Timer before moving again
+    [SerializeField]
     float moveTimer;
     const float MOVE_TIMER_MAX = 5.0f;
 
@@ -35,6 +45,14 @@ public class EnemySpawner : MonoBehaviour {
     float ymin;
     float ymax;
 
+    bool respawnEnemies;
+
+    bool initialTimer;
+
+    [SerializeField]
+    float respawnEnemiesTimer;
+    const float RESPAWN_ENEMIES_TIMER_MAX = 1.0f;
+    
 	// Use this for initialization
 	void Start () {
         // Load the prefab for the Enemy object
@@ -45,9 +63,13 @@ public class EnemySpawner : MonoBehaviour {
 
         // Store pointers to all enemy spawn points
         enemySpawnPoints = GameObject.FindGameObjectsWithTag("Waypoint");
+        currentEnemies = new GameObject[enemySpawnPoints.Length];
+        numberOfCurrentEnemies = 0;
 
-        isMovingLeft = true;
+        isMovingLeft = false;
         isMovingRight = false;
+        isMovingRightWaiting = true;
+        isMovingLeftWaiting = false;
 
         float minHeight = 999;
         float maxHeight = -999;
@@ -56,10 +78,20 @@ public class EnemySpawner : MonoBehaviour {
 
         Vector3 thisPosition;
         // Spawn an enemy at each spawn point
-        foreach (GameObject g in enemySpawnPoints)
+        // foreach (GameObject g in enemySpawnPoints)
+        for (int i = 0; i < currentEnemies.Length; i++)
         {
+            int index = RandomIndex();
+            if (currentEnemies[index] != null)
+            {
+                // Already taken
+                i--;
+                continue;
+            }
+
+            GameObject g = enemySpawnPoints[index];
             thisPosition = g.transform.position;
-            SpawnEnemy(thisPosition);
+            SpawnEnemy(thisPosition, index);
 
             if (thisPosition.x < minWidth)
             {
@@ -93,10 +125,36 @@ public class EnemySpawner : MonoBehaviour {
         xmin = leftmost.x + PADDING;
         ymax = upmost.y - PADDING;
         ymin = downmost.y + PADDING;
+
+        respawnEnemies = false;
+        initialTimer = true;
+        moveTimer = MOVE_TIMER_MAX;
 	}
 
     void Update ()
     {
+        if (initialTimer)
+        {
+            moveTimer -= Time.deltaTime;
+            if (moveTimer <= 0)
+            {
+                initialTimer = false;
+
+                if (isMovingRightWaiting)
+                {
+                    isMovingRightWaiting = false;
+                    isMovingRight = true;
+                }
+                else
+                {
+                    isMovingLeftWaiting = false;
+                    isMovingLeft = true;
+                }
+            }
+
+            return;
+        }
+
         if (isMovingRight)
         {
             transform.position += Vector3.right * SPEED * Time.deltaTime;
@@ -154,6 +212,16 @@ public class EnemySpawner : MonoBehaviour {
                 }
             }
         }
+
+        if (respawnEnemies)
+        {
+            respawnEnemiesTimer -= Time.deltaTime;
+            if (respawnEnemiesTimer <= 0.0f)
+            {
+                RespawnNextEnemyRandom();
+                respawnEnemiesTimer = RESPAWN_ENEMIES_TIMER_MAX;
+            }
+        }
     }
 	
     /// <summary>
@@ -163,13 +231,128 @@ public class EnemySpawner : MonoBehaviour {
     void SpawnEnemy(Vector3 position)
     {
         // Instantiates an enemy object
-        GameObject enemy = Instantiate(enemyPrefab, position, Quaternion.identity) as GameObject;
-        
+        GameObject enemy = Instantiate(enemyPrefab, Vector3.zero, Quaternion.identity) as GameObject;
+        enemy.GetComponent<EnemyController>().Player = GameObject.Find("Player").GetComponent<PlayerController>();
+
+        for (int i = 0; i < currentEnemies.Length; i++)
+        {
+            if (currentEnemies[i] == null)
+            {
+                currentEnemies[i] = enemy;
+                enemy.transform.parent = enemySpawnPoints[i].transform;
+                break;
+            }
+        }
+
         // Sets the parent object of the spawned enemy
-        enemy.transform.parent = transform;
+        //enemy.transform.parent = transform;
 
         // Choose a random sprite for the prefab
-        int index = (int)Random.Range(0, enemySprites.Length - 1);
+        int index = RandomIndex(0, enemySprites.Length);
         enemy.GetComponent<SpriteRenderer>().sprite = enemySprites[index];
+
+        numberOfCurrentEnemies++;
+        if (numberOfCurrentEnemies == currentEnemies.Length)
+        {
+            respawnEnemies = false;
+        }
+    }
+
+    /// <summary>
+    /// Spawns and enemy at the given location
+    /// </summary>
+    /// <param name="position">Starting position of the new enemy</param>
+    void SpawnEnemy(Vector3 position, int index)
+    {
+        // Instantiates an enemy object
+        GameObject enemy = Instantiate(enemyPrefab, Vector3.zero, Quaternion.identity) as GameObject;
+        //enemy.GetComponent<EnemyController>().Player = GameObject.Find("Player").GetComponent<PlayerController>();
+
+        currentEnemies[index] = enemy;
+        enemy.transform.parent = enemySpawnPoints[index].transform;
+
+        // Sets the parent object of the spawned enemy
+        //enemy.transform.parent = transform;
+
+        // Choose a random sprite for the prefab
+        int spriteIndex = RandomIndex(0, enemySprites.Length);
+        enemy.GetComponent<SpriteRenderer>().sprite = enemySprites[spriteIndex];
+
+        numberOfCurrentEnemies++;
+        if (numberOfCurrentEnemies == currentEnemies.Length)
+        {
+            respawnEnemies = false;
+        }
+    }
+
+    public int NumberOfCurrentEnemies
+    {
+        get
+        {
+            return numberOfCurrentEnemies;
+        }
+    }
+
+    /*void RespawnNextEnemy()
+    {
+        for(int i = 0; i < currentEnemies.Length; i++)
+        {
+            if (currentEnemies[i] == null)
+            {
+                SpawnEnemy(enemySpawnPoints[i].transform.position);
+                return;
+            }
+        }
+    }*/
+
+    void RespawnNextEnemyRandom()
+    {
+        for (int i = 0; i < currentEnemies.Length; i++)
+        {
+            int index = RandomIndex(0, currentEnemies.Length);
+            Debug.Log(index);
+            if (currentEnemies[index] == null)
+            {
+                SpawnEnemy(enemySpawnPoints[i].transform.position, index);
+                return;
+            }
+            else
+            {
+                i--;
+                continue;
+            }
+        }
+    }
+
+    public void AllEnemiesAreDead()
+    {
+        respawnEnemies = true;
+
+        respawnEnemiesTimer = RESPAWN_ENEMIES_TIMER_MAX;
+    }
+
+    public void EnemyDied()
+    {
+        numberOfCurrentEnemies--;
+
+        if (numberOfCurrentEnemies == 0)
+        {
+            AllEnemiesAreDead();
+        }
+    }
+
+    int RandomIndex()
+    {
+        return (int)Mathf.Round(Random.Range(0, currentEnemies.Length));
+    }
+
+    int RandomIndex(int min, int max)
+    {
+        return (int)Mathf.Round(Random.Range(min, max));
+    }
+
+    int RandomIndex(GameObject[] g)
+    {
+        return (int)Mathf.Round(Random.Range(0, g.Length));
     }
 }

@@ -6,6 +6,10 @@ public class PlayerController : MonoBehaviour {
     // Allows this object to be a singleton
     private static PlayerController thisPlayer = null;
 
+    // Laser Beam to shoot when firing
+    [SerializeField]
+    private GameObject laserBeam;
+
     // Physics variables
     private float speed;
 
@@ -23,7 +27,12 @@ public class PlayerController : MonoBehaviour {
     // Tracks if the player is active in this scene
     //     If not, hides the player from the camera
     private bool isActive;
-    
+
+    int numberOfEnemies;
+
+    private const int HEALTH_MAX = 10;
+    private int health;
+
     private void Awake()
     {
         // Checks if another instance of this object exists
@@ -80,6 +89,12 @@ public class PlayerController : MonoBehaviour {
         xmax = rightmost.x - padding;
         ymin = downmost.y + padding;
         ymax = upmost.y - padding;
+
+        laserBeam = Resources.Load<GameObject>("Prefabs/PlayerLaser");
+
+        numberOfEnemies = 0;
+
+        health = HEALTH_MAX;
     }
 	
 	// Update is called once per frame
@@ -89,9 +104,12 @@ public class PlayerController : MonoBehaviour {
         if (isActive)
         {
             // Handle "fire" input
-            if (Input.GetAxis("Fire") > 0)
+            if (Input.GetButtonDown("Fire"))
             {
                 Debug.Log("Shot fired");
+
+                GameObject laser = Instantiate(laserBeam, transform.position, Quaternion.identity) as GameObject;
+                //laser.GetComponent<Rigidbody2D>().velocity = new Vector3(0, )
             }
 
             // Take input from WASD or Arrow Keys
@@ -124,6 +142,40 @@ public class PlayerController : MonoBehaviour {
             // Hide from camera
             transform.position = new Vector3(0, -200f, 0);
             isActive = false;
+        }
+    }
+
+    public void UpdateNumberOfEnemies(int enemies)
+    {
+        if (enemies < 0)
+        {
+            throw new System.InvalidOperationException("Can't have negative enemies");
+        }
+        else if (enemies == 0)
+        {
+            Debug.Log("All enemies are dead!");
+            // Win!
+            //GameObject.Find("EnemyFormation").GetComponent<EnemySpawner>().AllEnemiesAreDead();
+        }
+        else
+        {
+            numberOfEnemies = enemies;
+        }
+    }
+
+    public void KilledEnemy()
+    {
+        UpdateNumberOfEnemies(GameObject.Find("EnemyFormation").GetComponent<EnemySpawner>().NumberOfCurrentEnemies);
+    }
+
+    public void Hit()
+    {
+        health--;
+
+        if (health == 0)
+        {
+            // Lose! :(
+            Destroy(gameObject);
         }
     }
 }

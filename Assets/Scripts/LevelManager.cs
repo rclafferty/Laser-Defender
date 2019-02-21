@@ -15,6 +15,7 @@ public class LevelManager : MonoBehaviour {
     /// Centralized method for handling requests to quit the application.
     /// </summary>
 	public void QuitRequest(){
+        UnityEditor.EditorApplication.isPlaying = false;
 		Application.Quit ();
 	}
 }
