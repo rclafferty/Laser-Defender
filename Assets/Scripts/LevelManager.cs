@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
+using UnityEditor;
+
 public class LevelManager : MonoBehaviour {
 
     /// <summary>
@@ -15,7 +17,10 @@ public class LevelManager : MonoBehaviour {
     /// Centralized method for handling requests to quit the application.
     /// </summary>
 	public void QuitRequest(){
-        UnityEditor.EditorApplication.isPlaying = false;
-		Application.Quit ();
+#if UNITY_EDITOR
+        EditorApplication.isPlaying = false;
+#else
+        Application.Quit ();
+#endif
 	}
 }

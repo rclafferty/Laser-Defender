@@ -97,10 +97,10 @@ public class PlayerController : MonoBehaviour {
         numberOfEnemies = 0;
 
         health = HEALTH_MAX;
-        GameObject.Find("HealthText").GetComponent<Text>().text = "Health:  " + health;
+        //GameObject.Find("HealthText").GetComponent<Text>().text = "Health:  " + health;
 
         score = 0;
-        GameObject.Find("ScoreText").GetComponent<Text>().text = "Score:  " + score;
+        //GameObject.Find("ScoreText").GetComponent<Text>().text = "Score:  " + score;
     }
 	
 	// Update is called once per frame

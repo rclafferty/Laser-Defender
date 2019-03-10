@@ -792,6 +792,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20b538be6036e14478eaaad837c62927, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  laserBeam: {fileID: 0}
 --- !u!212 &1169583289
 SpriteRenderer:
   m_ObjectHideFlags: 0
