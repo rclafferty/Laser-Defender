@@ -1,22 +1,63 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
-public class MusicPlayer : MonoBehaviour {
+public class MusicPlayer : MonoBehaviour
+{
+    static MusicPlayer instance = null;
 
-    // Singleton music player
-	static MusicPlayer instance = null;
-	
-	void Start () {
-        // If this is NOT the first instance of the object
-		if (instance != null && instance != this) {
-            // Destroy this object
-			Destroy (gameObject);
-			print ("Duplicate music player self-destructing!");
-		} else {
-            // Set this object as the singleton
-			instance = this;
-            // Do not destroy between scenes
-			DontDestroyOnLoad(gameObject);
-            this.GetComponent<AudioSource>().Play();
-		}
-	}
+    [SerializeField] AudioSource source;
+
+    [SerializeField] AudioClip intro;
+    [SerializeField] AudioClip gameOver;
+    [SerializeField] AudioClip game;
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+
+            source.clip = intro;
+            source.Play();
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    public void PlayGameMusic()
+    {
+        source.clip = game;
+        source.loop = true;
+        source.Play();
+    }
+
+    public void PlayLoadingScreenMusic()
+    {
+        source.clip = intro;
+        source.loop = false;
+        source.Play();
+    }
+
+    public void PlayGameOverMusic()
+    {
+        source.clip = gameOver;
+        source.loop = true;
+        source.Play();
+    }
 }

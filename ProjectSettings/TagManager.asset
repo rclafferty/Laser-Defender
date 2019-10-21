@@ -4,8 +4,7 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Waypoint
-  - Enemy
+  - Path Waypoint
   layers:
   - Default
   - TransparentFX
@@ -15,8 +14,8 @@ TagManager:
   - UI
   - 
   - 
-  - Player
   - Enemy
+  - Laser
   - 
   - 
   - 
@@ -40,18 +39,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Projectiles
+    uniqueID: 3754583849
+    locked: 0
   - name: Default
     uniqueID: 0
-    locked: 0
-  - name: Enemy Lasers
-    uniqueID: 3335609219
-    locked: 0
-  - name: Enemy
-    uniqueID: 256382733
-    locked: 0
-  - name: Player Lasers
-    uniqueID: 3518179731
-    locked: 0
-  - name: Player
-    uniqueID: 4292975985
     locked: 0

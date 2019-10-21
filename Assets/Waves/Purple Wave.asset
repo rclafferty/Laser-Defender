@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c227571add0f8624c856db9fe0cfb77a, type: 3}
+  m_Name: Purple Wave
+  m_EditorClassIdentifier: 
+  enemyPrefab: {fileID: 1583425841452444357, guid: 2aaa7a4874e2b0d4bb8f0ddc6ccf7c39,
+    type: 3}
+  pathPrefab: {fileID: 7490509514136145836, guid: e21eaa031d5b38c4ab7ed70897f2238b,
+    type: 3}
+  timeBetweenSpawns: 2
+  spawnRandomFactor: 0.5
+  numberOfEnemies: 2
+  moveSpeed: 1
